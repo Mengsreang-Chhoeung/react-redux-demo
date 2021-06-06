@@ -1,25 +1,38 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { useCallback } from 'react';
+import RestaurantPage from './components/Restaurant';
+import {addRestaurant, removeRestaurant} from './redux/RestaurantActionCreator';
+import {Dispatch} from 'redux';
+import { useSelector, shallowEqual, useDispatch } from 'react-redux';
 
-function App() {
+const App: React.FC = () => {
+
+  const restaurants: readonly IRestaurant[] = useSelector(
+    (state: RestaurantState) => state.restaurants,
+    shallowEqual
+  );
+
+  const dispatch: Dispatch<any> = useDispatch();
+
+  const saveRestaurant = useCallback(
+    (restaurant: IRestaurant) => {
+      dispatch(addRestaurant(restaurant))
+    },
+    [dispatch]
+  );
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <React.Fragment>
+      {
+        restaurants.map((restaurant: IRestaurant) => (
+          <RestaurantPage
+            key={restaurant.id} 
+            saveRestaurant={saveRestaurant} 
+            removeRestaurant={removeRestaurant} 
+            restaurant={restaurant}
+          />
+        ))
+      }
+    </React.Fragment>
   );
 }
 
